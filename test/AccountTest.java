@@ -148,4 +148,12 @@ public class AccountTest {
 		assertEquals(requestSize, me.getIncomingRequests().size());
 	}
 
+    @Test
+	public void shouldNotBeAbleToBeFriendsWithoutFriendshipRequest() {
+		her.friendshipAccepted(me);
+		assertFalse(me.hasFriend(her.getUserName()));
+		assertFalse(her.hasFriend(me.getUserName()));;
+	}
+
+
 }

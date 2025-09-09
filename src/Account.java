@@ -40,15 +40,15 @@ public class Account  {
 
     // an incoming friend request to this account's owner from another member account
     public void requestFriendship(Account fromAccount) {
-
-
-        if ((fromAccount != null) && !friends.contains(fromAccount.getUserName())) {
+        if (fromAccount == null)
+            return;
+        if (!friends.contains(fromAccount.getUserName())) {
             incomingRequests.add(fromAccount.getUserName());
             fromAccount.outgoingRequests.add(this.getUserName());
+            if (autoAcceptFriendships) {
+                fromAccount.friendshipAccepted(this);
+            }
         }
-        if (autoAcceptFriendships) {
-			friendshipAccepted(fromAccount);
-		}
     }
 
     // check if account owner has a member with user name userName as a friend
@@ -57,16 +57,36 @@ public class Account  {
     }
 
     // receive an acceptance from a member to whom a friend request has been sent and from whom no response has been received
-    public void friendshipAccepted(Account toAccount) {
+    // public void friendshipAccepted(Account toAccount) {
         
-        // if (!toAccount.incomingRequests.contains(this.getUserName())) {
-        //     return; // no pending request from toAccount
-        // }
-        // make them friends
-        friends.add(toAccount.getUserName());
-        toAccount.friends.add(this.getUserName());
-        toAccount.incomingRequests.remove(this.getUserName());
-        outgoingRequests.remove(toAccount.getUserName());
+    //     // if (!toAccount.incomingRequests.contains(this.getUserName())) {
+    //     //     return; // no pending request from toAccount
+    //     // }
+    //     // make them friends
+    //     friends.add(toAccount.getUserName());
+    //     toAccount.friends.add(this.getUserName());
+    //     toAccount.incomingRequests.remove(this.getUserName());
+    //     outgoingRequests.remove(toAccount.getUserName());
+    // }
+
+    // receive an acceptance from a member to whom a friend request has been sent and from whom no response has been received
+	// public void friendshipAccepted(Account toAccount) {
+	// 	if (toAccount.getIncomingRequests().contains(this.getUserName())) {
+	// 		friends.add(toAccount.getUserName());
+	// 		toAccount.friends.add(this.getUserName());
+	// 		toAccount.incomingRequests.remove(this.getUserName());
+	// 		outgoingRequests.remove(toAccount.getUserName());
+	// 	}
+	// }
+
+    // receive an acceptance from a member to whom a friend request has been sent and from whom no response has been received
+    public void friendshipAccepted(Account toAccount) {
+        if (toAccount.incomingRequests.contains(this.getUserName())) {
+            friends.add(toAccount.getUserName());
+            toAccount.friends.add(this.getUserName());
+            toAccount.incomingRequests.remove(this.getUserName());
+            outgoingRequests.remove(toAccount.getUserName());
+        }
     }
     
     public Set<String> getFriends() {

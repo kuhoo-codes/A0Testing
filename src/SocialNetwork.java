@@ -54,7 +54,9 @@ public class SocialNetwork {
 	
 	// Accept all friend requests that are pending a response from me
 	public void acceptAllFriendshipsTo(Account me) {
-		me.getIncomingRequests().forEach(requester -> acceptFriendshipFrom(requester, me));
+		for (String requester : new HashSet<String>(me.getIncomingRequests())) {
+			acceptFriendshipFrom(requester, me);
+		}
 	}
 
 	// from my account, accept a pending friend request from another user with userName
