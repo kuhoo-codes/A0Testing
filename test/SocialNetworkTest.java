@@ -8,10 +8,12 @@ import org.junit.Test;
 
 
 public class SocialNetworkTest {
-
+	SocialNetwork sn;
+	Account me, her, another;
 	
 	@Before
 	public void setUp() throws Exception {
+	sn = new SocialNetwork();
 	}
 
 	@After
@@ -21,15 +23,13 @@ public class SocialNetworkTest {
 
 	@Test 
 	public void socialNetworkIsCreated() {
-		SocialNetwork sn = new SocialNetwork();
-		Account me = sn.join("Hakan");
+		me = sn.join("Hakan");
 		assertNotNull(me);
 		assertEquals("Hakan", me.getUserName());
 	}
 	
 	@Test 
 	public void canListSingleMemberOfSocialNetworkAfterOnePersonJoiningAndSizeOfNetworkEqualsOne() {
-		SocialNetwork sn = new SocialNetwork();
 		sn.join("Hakan");
 		Collection<String> members = sn.listMembers();
 		assertEquals(1, members.size());
@@ -38,7 +38,6 @@ public class SocialNetworkTest {
 	
 	@Test 
 	public void twoPeopleCanJoinSocialNetworkAndSizeOfNetworkEqualsTwo() {
-		SocialNetwork sn = new SocialNetwork();
 		sn.join("Hakan");
 		sn.join("Cecile");
 		Collection<String> members = sn.listMembers();
@@ -48,17 +47,19 @@ public class SocialNetworkTest {
 	}
 	
 	@Test 
-	public void SendAndAcceptFriendRequest() {
+	public void sendFriendRequest() {
 		// test sending friend request
-		SocialNetwork sn = new SocialNetwork();
-		Account me = sn.join("Hakan");
-		Account her = sn.join("Cecile");
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
 		assertNotNull(me);
 		assertNotNull(her);
 		sn.sendFriendshipTo("Cecile", me);
 		assertTrue(her.getIncomingRequests().contains("Hakan"));
-		// initialize and test accepting a friendRequest
-	    sn = new SocialNetwork();
+	}
+	
+	@Test 
+	public void acceptFriendRequest() {
+		// test accepting a friendRequest
 		me = sn.join("Hakan");
 		her = sn.join("Cecile");
 		sn.sendFriendshipTo("Cecile", me);
@@ -66,17 +67,61 @@ public class SocialNetworkTest {
 		assertTrue(me.hasFriend("Cecile"));
 		assertTrue(her.hasFriend("Hakan"));
 	}
-	
+
+		
 	@Test 
-	public void acceptingFriends() {
-		SocialNetwork sn = new SocialNetwork();
-		Account john = sn.join("John");
-		Account mary = sn.join("Mary");
-		sn.sendFriendshipTo("Mary", john);
-		sn.acceptFriendshipFrom("John", mary);
-		assertTrue(mary.hasFriend("John"));
+	public void acceptAllFriendships() {
+		// test accepting all friendRequest
+		me = sn.join("Hakan");
+
+		her = sn.join("Cecile");
+		sn.sendFriendshipTo("Hakan", her);
+		
+		assertFalse("Incoming requests should not be empty after sending a request", me.getIncomingRequests().isEmpty());
+		sn.acceptAllFriendshipsTo(me);
+		assertTrue("Incoming requests should be empty after accepting all requests", me.getIncomingRequests().isEmpty());
+
 	}
 	
-	
+	@Test 
+	public void rejectFriendRequest() {
+		// test reject a friendRequest
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.sendFriendshipTo("Cecile", me);
+		sn.rejectFriendshipFrom("Hakan", her);
+		assertFalse(me.hasFriend("Cecile"));
+		assertFalse(her.hasFriend("Hakan"));
+	}
 
+		
+	@Test 
+	public void rejectAllFriendships() {
+		// test reject all friendRequest
+		me = sn.join("Hakan");
+
+		her = sn.join("Cecile");
+		sn.sendFriendshipTo("Hakan", her);
+		
+		assertFalse("Incoming requests should not be empty after sending a request", me.getIncomingRequests().isEmpty());
+
+		sn.rejectAllFriendshipsFrom(me);
+		// [ TODO ] fix this test
+		assertTrue("Incoming requests should be empty after accepting all requests", me.getIncomingRequests().isEmpty());
+		assertFalse(me.hasFriend("Cecile"));
+
+	}
+	
+	@Test
+	public void autoAcceptFriendships() {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.sendFriendshipTo("Hakan", her);
+		sn.autoAcceptFriendshipsTo(me);
+		assertTrue(me.hasFriend("Cecile"));
+		// [ TODO ] fix this test
+
+		assertTrue(her.hasFriend("Hakan"));
+
+	}
 }

@@ -43,5 +43,25 @@ public class SocialNetwork {
 		Account accountForUserName = findAccountForUserName(userName);
 		accountForUserName.friendshipAccepted(me);
 	}
+	
+	// Accept all friend requests that are pending a response from me
+	public void acceptAllFriendshipsTo(Account me) {
+		me.getIncomingRequests().forEach(requester -> acceptFriendshipFrom(requester, me));
+	}
+
+	// from my account, accept a pending friend request from another user with userName
+	public void rejectFriendshipFrom(String userName, Account me) {
+		Account accountForUserName = findAccountForUserName(userName);
+		accountForUserName.friendshipRejected(me);
+	}
+	
+	// Accept all friend requests that are pending a response from me
+	public void rejectAllFriendshipsFrom(Account me) {
+		me.getOutgoingRequests().forEach(active -> rejectFriendshipFrom(active, me));
+	}
+
+	public void autoAcceptFriendshipsTo(Account me){
+		me.autoAcceptFriendships();
+	};
 
 }
