@@ -1,5 +1,8 @@
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,16 +36,20 @@ public class AccountTest {
     }
     
     @Test
-    public void twoFriendRequestsFromDifferentPeopleResultsInTwoIncomingRequests() {
+    public void requestFriendshipFromTwoUsersAddsBothToIncomingAndSizeMatches() {
         me.requestFriendship(her);
         me.requestFriendship(another);
-        assertEquals(2, me.getIncomingRequests().size());
+        Set<String> expected = new HashSet<>();
+        expected.add(her.getUserName());
+        expected.add(another.getUserName());
+
+        assertEquals(expected.size(), me.getIncomingRequests().size());
         assertTrue(me.getIncomingRequests().contains(another.getUserName()));
         assertTrue(me.getIncomingRequests().contains(her.getUserName()));
     }
     
     @Test
-    public void twoFriendRequestsFromOnePersonResultsInOneIncomingRequest() {
+    public void duplicateRequestsFromSameUserAddsSingleIncoming() {
         me.requestFriendship(her);
         me.requestFriendship(her);
         assertEquals(1, me.getIncomingRequests().size());
@@ -63,7 +70,7 @@ public class AccountTest {
     }
     
     @Test
-    public void everybodyAreFriends() {
+    public void mutualAcceptsAmongAllEstablishMutualFriendships() {
         me.requestFriendship(her);
         me.requestFriendship(another);
         her.requestFriendship(another);
@@ -89,7 +96,7 @@ public class AccountTest {
     }
     //Additional Test to add
 	@Test
-	public void afterAcceptingFriendRequestTwoPeopleBecomeFriends() {
+	public void friendshipAcceptedEstablishesMutualFriendship() {
 		me.requestFriendship(her);
 		her.friendshipAccepted(me);
 		assertTrue(me.hasFriend(her.getUserName()));
@@ -97,7 +104,7 @@ public class AccountTest {
 	}
     //Task 5 Testing
 	@Test
-    public void autoAcceptFriendshipsWithOneIncomingAddsOneFriends() {
+    public void autoAcceptFriendshipsWithOneIncomingAddsThatFriendMutually() {
         me.autoAcceptFriendships();
         me.requestFriendship(her);
         assertTrue(me.hasFriend(her.getUserName()));
@@ -118,16 +125,16 @@ public class AccountTest {
 
 	//Task 6 Testing
 	@Test
-	public void cancelFriendshipCausesTwoPeopleToNoLongerBeFriends() {
-		afterAcceptingFriendRequestTwoPeopleBecomeFriends();
+	public void cancelFriendshipRemovesMutualFriendship() {
+		friendshipAcceptedEstablishesMutualFriendship();
 		her.cancelFriendship(me);
 		assertFalse(me.hasFriend(her.getUserName()));
 		assertFalse(her.hasFriend(me.getUserName()));
 	}
 
 	@Test
-	public void cancelFriendshipTwiceResultsInStillNotBeingFriends() {
-		afterAcceptingFriendRequestTwoPeopleBecomeFriends();
+	public void cancelFriendshipTwiceKeepsUsersNotFriends() {
+		friendshipAcceptedEstablishesMutualFriendship();
 		her.cancelFriendship(me);
 		her.cancelFriendship(me);
 		assertFalse(me.hasFriend(her.getUserName()));
@@ -135,21 +142,21 @@ public class AccountTest {
 	}
 	
 	@Test
-	public void cancelFriendshipWhenNotFriendsResultsInNotBeingFriends() {
+	public void cancelFriendshipWhenNotFriendsHasNoEffect() {
 		her.cancelFriendship(me);
 		assertFalse(me.hasFriend(her.getUserName()));
 		assertFalse(her.hasFriend(me.getUserName()));
 	}
 
     @Test
-	public void receivingFriendRequestFromANullAccountShouldHaveNoEffect() {
+	public void requestFriendshipWithNullAccountHasNoEffect() {
 		int requestSize = me.getIncomingRequests().size();
 		me.requestFriendship(null);
 		assertEquals(requestSize, me.getIncomingRequests().size());
 	}
 
     @Test
-	public void shouldNotBeAbleToBeFriendsWithoutFriendshipRequest() {
+	public void friendshipAcceptedWithoutRequestDoesNotEstablishFriendship() {
 		her.friendshipAccepted(me);
 		assertFalse(me.hasFriend(her.getUserName()));
 		assertFalse(her.hasFriend(me.getUserName()));;

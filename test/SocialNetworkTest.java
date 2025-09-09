@@ -24,25 +24,33 @@ public class SocialNetworkTest {
 	}
 
 	@Test 
-	public void socialNetworkIsCreated() { // rename --> 
+	public void possibleToCreateSocialNetworkWithSingleMember() { // rename --> 
 		me = sn.join("Hakan");
 		assertNotNull(me);
 		assertEquals("Hakan", me.getUserName());
 	}
+
 	@Test
-	public void joiningTheSocialNetworkWithNullUserNameShouldReturnNullAccount() {
+	public void joinSNWhenUserNameTakenReturnsNull() {
+		me = sn.join("Hakan");
+		another = sn.join("Hakan");
+		assertEquals(another, null);
+	}
+
+	@Test
+	public void joinWithNullUserNameReturnsNull() {
 		me = sn.join(null);
 		assertNull(me);
 	}	
 	
 	@Test
-	public void joiningTheSocialNetworkWithEmptyUserNameShouldReturnNullAccount() {
+	public void joinWithEmptyUserNameReturnsNull() {
 		me = sn.join("");
 		assertNull(me);
 	}
 
 	@Test 
-	public void canListSingleMemberOfSocialNetworkAfterOnePersonJoiningAndSizeOfNetworkEqualsOne() {
+	public void listMembersAfterOneJoinContainsUserAndSizeMatches() {
 		sn.join("Hakan");
 		Collection<String> members = sn.listMembers();
 		assertEquals(1, members.size());
@@ -50,7 +58,7 @@ public class SocialNetworkTest {
 	}
 	
 	@Test 
-	public void twoPeopleJoiningSocialNetworkResultsInSizeOfNetworkEqualsTwo() { // rename --> make it generic like if people join the network increases
+	public void sizeOfSNMatchesNoOfMultiplePeopleJoining() { // rename --> make it generic like if people join the network increases
 		Set<Account> users = new HashSet<Account>();
 		users.add(sn.join("Hakan"));
 		users.add(sn.join("Cecile"));
@@ -78,18 +86,9 @@ public class SocialNetworkTest {
 		sn.sendFriendshipTo("Cecile", me);
         assertFalse(me.getOutgoingRequests().contains("Cecile"));
     }
-	//[to do - fix this test]
-	// @Test
-	// public void shouldNotBeAbleToBecomeFriendsIfOneIsNotAskedFirst() {
-	// 	me = sn.join("Hakan");
-	// 	her = sn.join("Cecile");
-	// 	sn.acceptFriendshipFrom("Cecile", me);
-	// 	assertFalse(me.hasFriend("Cecile"));
-	// 	assertFalse(her.hasFriend("Hakan"));
-	// }
 
 	@Test 
-	public void acceptingFriendRequestResultsInFriendshipEstablished() {
+	public void acceptFriendRequestResultsInFriendshipEstablished() {
 		// test accepting a friendRequest
 		me = sn.join("Hakan");
 		her = sn.join("Cecile");
@@ -140,7 +139,6 @@ public class SocialNetworkTest {
 
 	}
 	
-
 	//Task 5 Testing
 	@Test
 	public void autoAcceptFriendshipsWithOneIncomingAddsOneFriend() {
@@ -150,7 +148,6 @@ public class SocialNetworkTest {
 		sn.autoAcceptFriendshipsTo(me);
 		sn.sendFriendshipTo(me.getUserName(), her);
 		assertTrue(me.hasFriend(her.getUserName()));
-		// [ TODO ] fix this test
 		assertTrue(her.hasFriend(me.getUserName()));
 
 	}
@@ -172,16 +169,16 @@ public class SocialNetworkTest {
 	
 	//Task 6 Testing
 	@Test
-	public void sendingFriendshipCancellationToAccountCausesBothAccountsToNoLongerBeFriends() {
-		acceptingFriendRequestResultsInFriendshipEstablished();
+	public void cancelFriendshipRemovesMutualFriendship() {
+		acceptFriendRequestResultsInFriendshipEstablished();
 		sn.sendFriendshipCancellationTo("Cecile", me);
 		assertFalse(me.hasFriend("Cecile"));
 		assertFalse(her.hasFriend("Hakan"));
 	}
 
 	@Test
-    public void sendFriendshipCancellationTwiceResultsInStillNotFriends() {
-        acceptingFriendRequestResultsInFriendshipEstablished();
+    public void cancelFriendshipTwiceKeepsUsersNotFriends() {
+        acceptFriendRequestResultsInFriendshipEstablished();
         sn.sendFriendshipCancellationTo("Cecile", me);
         sn.sendFriendshipCancellationTo("Cecile", me);
         assertFalse(me.hasFriend(her.getUserName()));
@@ -189,7 +186,7 @@ public class SocialNetworkTest {
     }
 
 	@Test
-	public void sendFriendshipCancellationWhenNotFriendsResultsInNotBeingFriends() {
+	public void cancelFriendshipWhenNotFriendsHasNoEffect() {
 		me = sn.join("Hakan");
 		her = sn.join("Cecile");
         sn.sendFriendshipCancellationTo(her.getUserName(), me);
@@ -199,21 +196,21 @@ public class SocialNetworkTest {
 	
 	//Task 7 Testing
 	@Test
-	public void existingMemberLeavingRemovesAccountFromMemberList() {
+	public void leaveRemovesUserFromMembersList() {
 		me = sn.join("Hakan");
 		sn.leave(me);
 		assertFalse(sn.listMembers().contains(me.getUserName()));
 	}
 
 	@Test
-    public void leavingUserHasTheirAccountRemovedFromTheirFriendsLists() {
-        acceptingFriendRequestResultsInFriendshipEstablished();
+    public void leaveRemovesUserFromFriendsLists() {
+        acceptFriendRequestResultsInFriendshipEstablished();
         sn.leave(me);
         assertFalse(her.hasFriend(me.getUserName()));
     }
 
 	@Test
-	public void leavingUserIsRemovedFromIncomingRequestsOfOtherUserThatLeavingUserRequestedFriendshipFrom() {
+	public void leaveRemovesUserFromOthersIncomingRequests() {
 		me = sn.join("Hakan");
 		her = sn.join("Cecile");
 		her.requestFriendship(me);
@@ -223,7 +220,7 @@ public class SocialNetworkTest {
 	}
 	
 	@Test
-    public void leavingUserIsRemovedFromOutgoingRequestsOfOtherUserWhoRequestedFriendshipFromLeavingUser() {
+    public void leaveRemovesUserFromOthersOutgoingRequests() {
 		me = sn.join("Hakan");
 		her = sn.join("Cecile");
         me.requestFriendship(her);
@@ -233,7 +230,7 @@ public class SocialNetworkTest {
     }
 
 	 @Test
-	public void sendingAFriendRequestToAccountThatDoesNotExistShouldHaveNoEffect() {
+	public void sendFriendshipToMissingAccountDoesNotChangeOutgoing() {
 		me = sn.join("Hakan");
 		int requestSize = me.getOutgoingRequests().size();
 		String noExistUsername = "John";
@@ -241,15 +238,8 @@ public class SocialNetworkTest {
 		assertEquals(requestSize, me.getOutgoingRequests().size());
 	}
 
-	@Test
-	public void cannotJoinSocialNetworkIfAlreadyAnExistingMember() {
-		me = sn.join("Hakan");
-		another = sn.join("Hakan");
-		assertEquals(another, null);
-	}
-
     @Test 
-	public void existingMemberCanRejectAllFriendshipsAtOnce() {
+	public void rejectAllFriendshipsWithMultipleIncomingClearsIncomingAndAddsNoFriends() {
 		me = sn.join("Hakan");
 		her = sn.join("Cecile");
 		another = sn.join("Rafal");
@@ -262,7 +252,7 @@ public class SocialNetworkTest {
 	}
 	
 	@Test
-	public void shouldBeAbleToAcceptAllFriendRequestsAtOnce() {
+	public void acceptAllFriendshipsWithMultipleIncomingClearsIncomingAndAddsAllFriends() {
 		me = sn.join("Hakan");
 		her = sn.join("Cecile");
 		another = sn.join("Rafal");
