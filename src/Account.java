@@ -69,5 +69,13 @@ public class Account  {
 	public void autoAcceptFriendships() {
 		this.getIncomingRequests().forEach(requester -> friendshipAccepted(new Account(requester)));
 	}
+
+	// an existing friend of this account's owner is unfriending them
+	public void cancelFriendship(Account fromAccount) {
+		if (friends.contains(fromAccount.getUserName())) {
+			friends.remove(fromAccount.getUserName());
+			fromAccount.friends.remove(this.getUserName());
+		}
+	}
     
 }

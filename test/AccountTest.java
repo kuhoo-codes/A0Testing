@@ -16,9 +16,15 @@ public class AccountTest {
     }
 
     @Test
-    public void sendingFriendRequestResultsInIncomingRequest() {
+    public void receivingFriendRequestResultsInIncomingRequest() {
         me.requestFriendship(her);
         assertTrue(me.getIncomingRequests().contains(her.getUserName()));
+    }
+
+    @Test
+    public void sendingFriendRequestResultsInOutgoingRequest() {
+        her.requestFriendship(me);
+        assertTrue(me.getOutgoingRequests().contains(her.getUserName()));
     }
     
     @Test
@@ -47,6 +53,13 @@ public class AccountTest {
         me.requestFriendship(her);
         her.friendshipAccepted(me);
         assertFalse(me.getIncomingRequests().contains(her.getUserName()));
+    }
+    
+    @Test
+    public void afterFriendAcceptingFriendRequestOutgoingRequestsUpdated() {
+        her.requestFriendship(me);
+        me.friendshipAccepted(her);
+        assertFalse(me.getOutgoingRequests().contains(her.getUserName()));
     }
     
     @Test

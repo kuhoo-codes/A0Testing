@@ -56,12 +56,23 @@ public class SocialNetwork {
 	}
 	
 	// Accept all friend requests that are pending a response from me
-	public void rejectAllFriendshipsFrom(Account me) {
-		me.getOutgoingRequests().forEach(active -> rejectFriendshipFrom(active, me));
+	public void rejectAllFriendshipsTo(Account me) {
+		me.getIncomingRequests().forEach(active -> rejectFriendshipFrom(active, me));
 	}
 
 	public void autoAcceptFriendshipsTo(Account me){
 		me.autoAcceptFriendships();
 	};
+
+	// from another user with userName account, unfriending me as a friend
+	public void sendFriendshipCancellationTo(String userName, Account me) {
+		Account accountForUserName = findAccountForUserName(userName);
+		accountForUserName.cancelFriendship(me);
+	}
+
+	// from my account, leaving the social network
+	public void leave(Account me) {
+		accounts.remove(me);
+	}
 
 }
