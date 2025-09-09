@@ -7,9 +7,15 @@ public class SocialNetwork {
 
 	// join SN with a new user name
 	public Account join(String userName) {
-		Account newAccount = new Account(userName);
-		accounts.add(newAccount);
-		return newAccount;
+		if (userName == null || userName =="") return null;
+		// check if user name already exists
+		Account existingUser = findAccountForUserName(userName);
+		if (existingUser == null) {
+			Account newAccount = new Account(userName);
+			accounts.add(newAccount);
+			return newAccount;
+		}
+		return null;
 	}
 
 	// find a member by user name 
@@ -35,7 +41,9 @@ public class SocialNetwork {
 	// from my account, send a friend request to user with userName from my account
 	public void sendFriendshipTo(String userName, Account me) {
 		Account accountForUserName = findAccountForUserName(userName);
-		accountForUserName.requestFriendship(me);
+		if (accountForUserName != null) {
+			accountForUserName.requestFriendship(me);
+		}
 	}
 
 	// from my account, accept a pending friend request from another user with userName
@@ -57,8 +65,9 @@ public class SocialNetwork {
 	
 	// Accept all friend requests that are pending a response from me
 	public void rejectAllFriendshipsTo(Account me) {
-		me.getIncomingRequests().forEach(active -> rejectFriendshipFrom(active, me));
-	}
+		for (String requester : new HashSet<String>(me.getIncomingRequests())) {
+			rejectFriendshipFrom(requester, me);
+		}	}
 
 	public void autoAcceptFriendshipsTo(Account me){
 		me.autoAcceptFriendships();
@@ -72,6 +81,18 @@ public class SocialNetwork {
 
 	// from my account, leaving the social network
 	public void leave(Account me) {
+		//break off all friends
+		for (String friend : me.getFriends()) {
+			sendFriendshipCancellationTo(friend, me);
+		}
+		//reject all incoming friend requests
+		for (String requester : me.getIncomingRequests()) {
+			rejectFriendshipFrom(requester, me);
+		}
+		//retract all outgoing friend requests
+		for (String requestee : me.getOutgoingRequests()) {
+			rejectFriendshipFrom(me.getUserName(), findAccountForUserName(requestee));
+		}
 		accounts.remove(me);
 	}
 

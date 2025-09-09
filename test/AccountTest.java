@@ -87,5 +87,65 @@ public class AccountTest {
         assertFalse(me.getIncomingRequests().contains(her.getUserName()));
         assertFalse(her.getIncomingRequests().contains(me.getUserName()));
     }
+    //Additional Test to add
+	@Test
+	public void afterAcceptingFriendRequestTwoPeopleBecomeFriends() {
+		me.requestFriendship(her);
+		her.friendshipAccepted(me);
+		assertTrue(me.hasFriend(her.getUserName()));
+		assertTrue(her.hasFriend(me.getUserName()));
+	}
+    //Task 5 Testing
+	@Test
+    public void autoAcceptFriendshipsWithOneIncomingAddsOneFriends() {
+        me.autoAcceptFriendships();
+        me.requestFriendship(her);
+        assertTrue(me.hasFriend(her.getUserName()));
+        assertTrue(her.hasFriend(me.getUserName()));
+    }
+
+    @Test
+    public void autoAcceptFriendshipsWithTwoIncomingAddsTwoFriends() {
+        me.autoAcceptFriendships();
+        me.requestFriendship(her);
+		me.requestFriendship(another);
+		assertTrue(me.hasFriend(her.getUserName()));
+		assertTrue(her.hasFriend(me.getUserName()));
+		assertTrue(me.hasFriend(another.getUserName()));
+		assertTrue(another.hasFriend(me.getUserName()));
+    }
+
+
+	//Task 6 Testing
+	@Test
+	public void cancelFriendshipCausesTwoPeopleToNoLongerBeFriends() {
+		afterAcceptingFriendRequestTwoPeopleBecomeFriends();
+		her.cancelFriendship(me);
+		assertFalse(me.hasFriend(her.getUserName()));
+		assertFalse(her.hasFriend(me.getUserName()));
+	}
+
+	@Test
+	public void cancelFriendshipTwiceResultsInStillNotBeingFriends() {
+		afterAcceptingFriendRequestTwoPeopleBecomeFriends();
+		her.cancelFriendship(me);
+		her.cancelFriendship(me);
+		assertFalse(me.hasFriend(her.getUserName()));
+		assertFalse(her.hasFriend(me.getUserName()));
+	}
+	
+	@Test
+	public void cancelFriendshipWhenNotFriendsResultsInNotBeingFriends() {
+		her.cancelFriendship(me);
+		assertFalse(me.hasFriend(her.getUserName()));
+		assertFalse(her.hasFriend(me.getUserName()));
+	}
+
+    @Test
+	public void receivingFriendRequestFromANullAccountShouldHaveNoEffect() {
+		int requestSize = me.getIncomingRequests().size();
+		me.requestFriendship(null);
+		assertEquals(requestSize, me.getIncomingRequests().size());
+	}
 
 }

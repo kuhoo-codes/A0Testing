@@ -15,7 +15,9 @@ public class Account  {
     
     // list of members who are friends of this account's owner
     private Set<String> friends = new HashSet<String>();
-    
+
+    private boolean autoAcceptFriendships = false;
+
     public Account(String userName) {
         this.userName = userName;
     }
@@ -38,10 +40,15 @@ public class Account  {
 
     // an incoming friend request to this account's owner from another member account
     public void requestFriendship(Account fromAccount) {
-        if (!friends.contains(fromAccount.getUserName())) {
+
+
+        if ((fromAccount != null) && !friends.contains(fromAccount.getUserName())) {
             incomingRequests.add(fromAccount.getUserName());
             fromAccount.outgoingRequests.add(this.getUserName());
         }
+        if (autoAcceptFriendships) {
+			friendshipAccepted(fromAccount);
+		}
     }
 
     // check if account owner has a member with user name userName as a friend
@@ -51,6 +58,11 @@ public class Account  {
 
     // receive an acceptance from a member to whom a friend request has been sent and from whom no response has been received
     public void friendshipAccepted(Account toAccount) {
+        
+        // if (!toAccount.incomingRequests.contains(this.getUserName())) {
+        //     return; // no pending request from toAccount
+        // }
+        // make them friends
         friends.add(toAccount.getUserName());
         toAccount.friends.add(this.getUserName());
         toAccount.incomingRequests.remove(this.getUserName());
@@ -67,7 +79,7 @@ public class Account  {
     }
 
 	public void autoAcceptFriendships() {
-		this.getIncomingRequests().forEach(requester -> friendshipAccepted(new Account(requester)));
+		this.autoAcceptFriendships = true;
 	}
 
 	// an existing friend of this account's owner is unfriending them
