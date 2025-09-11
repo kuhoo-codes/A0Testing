@@ -1,13 +1,15 @@
 import java.util.HashSet;
 import java.util.Set;
 
-public class SocialNetwork {
+public class SocialNetwork implements ISocialNetwork {
 	
 	private Set<Account> accounts = new HashSet<Account>();
 
-	// join SN with a new user name
+	private Account current;
+
 	public Account join(String userName) {
-		if (userName == null || userName =="") return null;
+		if (userName == null || userName == "")
+			return null;
 		// check if user name already exists
 		Account existingUser = findAccountForUserName(userName);
 		if (existingUser == null) {
@@ -17,6 +19,14 @@ public class SocialNetwork {
 		}
 		return null;
 	}
+	
+	public Account login(Account me) {
+        if (me == null) return null;
+        Account existing = findAccountForUserName(me.getUserName());
+        if (existing == null) return null;
+        current = existing; 
+        return current;
+    }
 
 	// find a member by user name 
 	private Account findAccountForUserName(String userName) {
@@ -29,8 +39,7 @@ public class SocialNetwork {
 		return null;
 	}
 	
-	// list user names of all members
-	public Set<String> listMembers() {
+	public Set<String> listMembers() throws NoUserLoggedInException {
 		Set<String> members = new HashSet<String>();
 		for (Account each : accounts) {
 			members.add(each.getUserName());
@@ -38,64 +47,91 @@ public class SocialNetwork {
 		return members;
 	}
 	
-	// from my account, send a friend request to user with userName from my account
-	public void sendFriendshipTo(String userName, Account me) {
+	public boolean hasMember(String userName) throws NoUserLoggedInException {
+        return findAccountForUserName(userName) != null;
+    }
+	
+	public void sendFriendshipTo(String userName) throws NoUserLoggedInException {
 		Account accountForUserName = findAccountForUserName(userName);
 		if (accountForUserName != null) {
-			accountForUserName.requestFriendship(me);
+			accountForUserName.requestFriendship(current);
 		}
 	}
 
-	// from my account, accept a pending friend request from another user with userName
-	public void acceptFriendshipFrom(String userName, Account me) {
-		Account accountForUserName = findAccountForUserName(userName);
-		accountForUserName.friendshipAccepted(me);
+	private void ensureLoggedIn() throws NoUserLoggedInException {
+        if (current == null) throw new NoUserLoggedInException();
+    }
+
+	public void block(String userName) throws NoUserLoggedInException {
+        ensureLoggedIn();
+    }
+	
+	public void unblock(String userName) throws NoUserLoggedInException {
+		ensureLoggedIn();
 	}
 	
-	// Accept all friend requests that are pending a response from me
-	public void acceptAllFriendshipsTo(Account me) {
-		for (String requester : new HashSet<String>(me.getIncomingRequests())) {
-			acceptFriendshipFrom(requester, me);
+	public void sendFriendshipCancellationTo(String userName) throws NoUserLoggedInException {
+		Account accountForUserName = findAccountForUserName(userName);
+		accountForUserName.cancelFriendship(current);
+	}
+
+	public void acceptFriendshipFrom(String userName) throws NoUserLoggedInException {
+		Account accountForUserName = findAccountForUserName(userName);
+		accountForUserName.friendshipAccepted(current);
+	}
+
+	public void acceptAllFriendships() throws NoUserLoggedInException {
+		for (String requester : new HashSet<String>(current.getIncomingRequests())) {
+			acceptFriendshipFrom(requester);
 		}
 	}
 
-	// from my account, accept a pending friend request from another user with userName
-	public void rejectFriendshipFrom(String userName, Account me) {
+	public void rejectFriendshipFrom(String userName) throws NoUserLoggedInException {
 		Account accountForUserName = findAccountForUserName(userName);
-		accountForUserName.friendshipRejected(me);
+		accountForUserName.friendshipRejected(current);
 	}
 	
-	// Accept all friend requests that are pending a response from me
-	public void rejectAllFriendshipsTo(Account me) {
-		for (String requester : new HashSet<String>(me.getIncomingRequests())) {
-			rejectFriendshipFrom(requester, me);
-		}	}
+	public void rejectAllFriendships() throws NoUserLoggedInException {
+		for (String requester : new HashSet<String>(current.getIncomingRequests())) {
+			rejectFriendshipFrom(requester);
+		}
+	}
 
-	public void autoAcceptFriendshipsTo(Account me){
-		me.autoAcceptFriendships();
+	public void autoAcceptFriendships() throws NoUserLoggedInException {
+		current.autoAcceptFriendships();
 	};
 
-	// from another user with userName account, unfriending me as a friend
-	public void sendFriendshipCancellationTo(String userName, Account me) {
-		Account accountForUserName = findAccountForUserName(userName);
-		accountForUserName.cancelFriendship(me);
-	}
+	
+	public void cancelAutoAcceptFriendships() throws NoUserLoggedInException {
+        ensureLoggedIn();
+    }
 
-	// from my account, leaving the social network
-	public void leave(Account me) {
+	
+	public Set<String> recommendFriends() throws NoUserLoggedInException {
+        ensureLoggedIn();
+        return new HashSet<>();
+    }
+
+	public void leave() throws NoUserLoggedInException {
+		ensureLoggedIn();
 		//break off all friends
-		for (String friend : me.getFriends()) {
-			sendFriendshipCancellationTo(friend, me);
+		for (String friend : current.getFriends()) {
+			sendFriendshipCancellationTo(friend);
 		}
 		//reject all incoming friend requests
-		for (String requester : me.getIncomingRequests()) {
-			rejectFriendshipFrom(requester, me);
+		for (String requester : current.getIncomingRequests()) {
+			rejectFriendshipFrom(requester);
 		}
 		//retract all outgoing friend requests
-		for (String requestee : me.getOutgoingRequests()) {
-			rejectFriendshipFrom(me.getUserName(), findAccountForUserName(requestee));
+		for (String requestee : new HashSet<String>(current.getOutgoingRequests())) {
+			Account acc = findAccountForUserName(requestee);
+			if (acc != null) {
+				acc.getIncomingRequests().remove(current.getUserName());
+			}
+			current.getOutgoingRequests().remove(requestee);
 		}
-		accounts.remove(me);
+		accounts.remove(current);
+		current = null;
 	}
 
 }
