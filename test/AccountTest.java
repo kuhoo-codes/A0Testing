@@ -94,7 +94,7 @@ public class AccountTest {
         assertFalse(me.getIncomingRequests().contains(her.getUserName()));
         assertFalse(her.getIncomingRequests().contains(me.getUserName()));
     }
-    //Additional Test to add
+
 	@Test
 	public void friendshipAcceptedEstablishesMutualFriendship() {
 		me.requestFriendship(her);
@@ -102,7 +102,7 @@ public class AccountTest {
 		assertTrue(me.hasFriend(her.getUserName()));
 		assertTrue(her.hasFriend(me.getUserName()));
 	}
-    //Task 5 Testing
+
 	@Test
     public void autoAcceptFriendshipsWithOneIncomingAddsThatFriendMutually() {
         me.autoAcceptFriendships();
@@ -122,8 +122,6 @@ public class AccountTest {
 		assertTrue(another.hasFriend(me.getUserName()));
     }
 
-
-	//Task 6 Testing
 	@Test
 	public void cancelFriendshipRemovesMutualFriendship() {
 		friendshipAcceptedEstablishesMutualFriendship();
@@ -161,6 +159,5 @@ public class AccountTest {
 		assertFalse(me.hasFriend(her.getUserName()));
 		assertFalse(her.hasFriend(me.getUserName()));;
 	}
-
 
 }

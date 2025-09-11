@@ -1,9 +1,9 @@
 import java.util.HashSet;
-import java.util.Collection;
+import java.util.Set;
 
 public class SocialNetwork {
 	
-	private Collection<Account> accounts = new HashSet<Account>();
+	private Set<Account> accounts = new HashSet<Account>();
 
 	// join SN with a new user name
 	public Account join(String userName) {
@@ -30,8 +30,8 @@ public class SocialNetwork {
 	}
 	
 	// list user names of all members
-	public Collection<String> listMembers() {
-		Collection<String> members = new HashSet<String>();
+	public Set<String> listMembers() {
+		Set<String> members = new HashSet<String>();
 		for (Account each : accounts) {
 			members.add(each.getUserName());
 		}

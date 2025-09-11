@@ -1,6 +1,5 @@
 import static org.junit.Assert.*;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -52,7 +51,7 @@ public class SocialNetworkTest {
 	@Test 
 	public void listMembersAfterOneJoinContainsUserAndSizeMatches() {
 		sn.join("Hakan");
-		Collection<String> members = sn.listMembers();
+		Set<String> members = sn.listMembers();
 		assertEquals(1, members.size());
 		assertTrue(members.contains("Hakan"));
 	}
@@ -63,7 +62,7 @@ public class SocialNetworkTest {
 		users.add(sn.join("Hakan"));
 		users.add(sn.join("Cecile"));
 
-		Collection<String> members = sn.listMembers();
+		Set<String> members = sn.listMembers();
 		assertEquals(users.size(), members.size());
 		assertTrue(members.contains("Hakan"));
 		assertTrue(members.contains("Cecile"));
@@ -139,7 +138,6 @@ public class SocialNetworkTest {
 
 	}
 	
-	//Task 5 Testing
 	@Test
 	public void autoAcceptFriendshipsWithOneIncomingAddsOneFriend() {
 		
@@ -167,7 +165,6 @@ public class SocialNetworkTest {
 		assertTrue(another.hasFriend(me.getUserName()));
     }
 	
-	//Task 6 Testing
 	@Test
 	public void cancelFriendshipRemovesMutualFriendship() {
 		acceptFriendRequestResultsInFriendshipEstablished();
@@ -194,7 +191,6 @@ public class SocialNetworkTest {
         assertFalse(her.hasFriend(me.getUserName()));
     }
 	
-	//Task 7 Testing
 	@Test
 	public void leaveRemovesUserFromMembersList() {
 		me = sn.join("Hakan");
