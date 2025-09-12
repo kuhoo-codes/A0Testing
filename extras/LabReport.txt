@@ -5,34 +5,29 @@ Andrew ID: snyang, kuhoos
 
 1. Summary 
 
-// Describe briefly what you did during this lab.
-// List the tasks performed.
-// How many tests did you end up writing? 
-Re-wrote SocialNetwork.java to implement the functions listed in ISocialNetwork.java as well as the tests to match the new behaviour via TDD.
-Tasks 1, 2, 
-Roughly 3 tests per function, 
+ - Re-wrote SocialNetwork.java to implement the functions listed in ISocialNetwork.java as well as the tests to match the new behaviour via TDD.
+ - Firstly re-wrote most of the code and then mapped out all the edge cases for tests for the old and new functions.
+ - Wrote the tests first using the discussion on edge cases and then wrote the main production code.
+ - Performed a lot of debugging to resolve all the issues and completed integration of Production code and Test code.
+ - Roughly 3 tests per very new functionality added
  
 2. What worked well? 
+ - TDD made us think of edge cases before even jumping to the code bit. This was helpful in identifying where the function might have failed otherwise.
+ - Writing tests first made it easier to see what the function should actually do before we wrote any code.
+ - For example, when we worked on recommendFriends, we initially wrote a test that said “only return people with at least two mutual friends.” 
+ - That test failing reminded me not to include users with just one mutual connection or the ones blocked even if they come up in the list.
 
-// Describe one positive aspect of using TDD. Give a specific example.
-
+Having tests already there gave me confidence — every time I changed the code, I could run them and know right away if I broke something.
 3. What didn't work well? 
-
-// What is the worst challenge you faced when applying TDD?
-// Give a specific example. 
+ - The most difficult part was refactoring the code to make the old as well as new test cases to pass. It took a bit of back and forth to finalise it.
+ - Another main one was writing the block/unblock feature.
+ - We initially forgot that blocking should also cancel existing friendships and pending requests. 
+ - This made several tests to fail unexpectedly, since users were still appearing as friends after a block.
 
 4. How would you do it differently next time when applying TDD?
-
-// Relate this to the challenge. Provide a lesson learned.  
+ - Next time, We would like to write down out the expected state changes and flows extensively before writing code.
+ - For blocking, that would mean noting that friendships are removed, incoming are cleared, outgoing are cleared, and the blocked list is updated.
+ - Lesson learned was that mapping behaviour to tests first makes the TDD cycle smoother and prevents missing side effects.
 
 5. Comments and Suggestions on the Lab (Optional)
-
-// Be as specific as possible.
-// Point out any problems you encountered with the exercises performed.
-// Any bugs in assignment description? 
-// If compelled, point out your disagreements with design and implementation decisions imposed on you. 
-// Use bullet points.
-
-
-/** This report should be about one page long. **/
-/** For acceptable and non-acceptable examples, see CourseInfo document **/
+ - A few hints/tips on how to think of the edge cases or outliers would be of help
