@@ -34,12 +34,13 @@ public class SocialNetwork implements ISocialNetwork {
 		// not accessible to outside because that would give a user full access to another member's account
 		for (Account each : accounts) {
 			if (each.getUserName().equals(userName)) 
-					return each;
+				return each;
 		}
 		return null;
 	}
 	
 	public Set<String> listMembers() throws NoUserLoggedInException {
+		ensureLoggedIn();
 		Set<String> members = new HashSet<String>();
 		for (Account each : accounts) {
 			members.add(each.getUserName());
@@ -48,10 +49,12 @@ public class SocialNetwork implements ISocialNetwork {
 	}
 	
 	public boolean hasMember(String userName) throws NoUserLoggedInException {
+		ensureLoggedIn();
         return findAccountForUserName(userName) != null;
     }
 	
 	public void sendFriendshipTo(String userName) throws NoUserLoggedInException {
+		ensureLoggedIn();
 		Account accountForUserName = findAccountForUserName(userName);
 		if (accountForUserName != null) {
 			accountForUserName.requestFriendship(current);
@@ -71,33 +74,39 @@ public class SocialNetwork implements ISocialNetwork {
 	}
 	
 	public void sendFriendshipCancellationTo(String userName) throws NoUserLoggedInException {
+		ensureLoggedIn();
 		Account accountForUserName = findAccountForUserName(userName);
 		accountForUserName.cancelFriendship(current);
 	}
 
 	public void acceptFriendshipFrom(String userName) throws NoUserLoggedInException {
+		ensureLoggedIn();
 		Account accountForUserName = findAccountForUserName(userName);
 		accountForUserName.friendshipAccepted(current);
 	}
 
 	public void acceptAllFriendships() throws NoUserLoggedInException {
+		ensureLoggedIn();
 		for (String requester : new HashSet<String>(current.getIncomingRequests())) {
 			acceptFriendshipFrom(requester);
 		}
 	}
 
 	public void rejectFriendshipFrom(String userName) throws NoUserLoggedInException {
+		ensureLoggedIn();
 		Account accountForUserName = findAccountForUserName(userName);
 		accountForUserName.friendshipRejected(current);
 	}
 	
 	public void rejectAllFriendships() throws NoUserLoggedInException {
+		ensureLoggedIn();
 		for (String requester : new HashSet<String>(current.getIncomingRequests())) {
 			rejectFriendshipFrom(requester);
 		}
 	}
 
 	public void autoAcceptFriendships() throws NoUserLoggedInException {
+		ensureLoggedIn();
 		current.autoAcceptFriendships();
 	};
 

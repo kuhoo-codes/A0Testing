@@ -1,13 +1,16 @@
 LAB REPORT - TDD - L1
 
-Name: 
-Andrew ID:
+Name: Shannon Yang, Kuhoo Sharma
+Andrew ID: snyang, kuhoos
 
 1. Summary 
 
 // Describe briefly what you did during this lab.
 // List the tasks performed.
 // How many tests did you end up writing? 
+Re-wrote SocialNetwork.java to implement the functions listed in ISocialNetwork.java as well as the tests to match the new behaviour via TDD.
+Tasks 1, 2, 
+Roughly 3 tests per function, 
  
 2. What worked well? 
 
