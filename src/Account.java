@@ -98,8 +98,12 @@ public class Account  {
         outgoingRequests.remove(toAccount.getUserName());
     }
 
-	public void autoAcceptFriendships() {
-		this.autoAcceptFriendships = true;
+    public void autoAcceptFriendships() {
+        this.autoAcceptFriendships = true;
+    }
+    
+    public void cancelAutoAcceptFriendships() {
+		this.autoAcceptFriendships = false;
 	}
 
 	// an existing friend of this account's owner is unfriending them

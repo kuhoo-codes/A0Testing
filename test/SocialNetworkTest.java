@@ -243,7 +243,6 @@ public class SocialNetworkTest {
 	@Test 
 	public void rejectAllFriendshipsResultsInEmptyIncomingRequestsAndNoFriendshipEstablished() 
 			throws NoUserLoggedInException {
-		// test reject all friendRequest
 		me = sn.join("Hakan");
 		her = sn.join("Cecile");
 		sn.login(her);
@@ -292,19 +291,60 @@ public class SocialNetworkTest {
 	public void autoAcceptFriendshipsWithTwoIncomingAddsTwoFriends() 
 			throws NoUserLoggedInException {
 		me = sn.join("Hakan");
-        her = sn.join("Cecile");
-        another = sn.join("Rafal");
-        sn.login(me);
-        sn.autoAcceptFriendships();
-        sn.login(her);
-        sn.sendFriendshipTo(me.getUserName());
-        sn.login(another);
-        sn.sendFriendshipTo(me.getUserName());
-        assertTrue(me.hasFriend(her.getUserName()));
-        assertTrue(her.hasFriend(me.getUserName()));
-        assertTrue(me.hasFriend(another.getUserName()));
-        assertTrue(another.hasFriend(me.getUserName()));
-    }
+		her = sn.join("Cecile");
+		another = sn.join("Rafal");
+		sn.login(me);
+		sn.autoAcceptFriendships();
+		sn.login(her);
+		sn.sendFriendshipTo(me.getUserName());
+		sn.login(another);
+		sn.sendFriendshipTo(me.getUserName());
+		assertTrue(me.hasFriend(her.getUserName()));
+		assertTrue(her.hasFriend(me.getUserName()));
+		assertTrue(me.hasFriend(another.getUserName()));
+		assertTrue(another.hasFriend(me.getUserName()));
+	}
+	
+	// cancelAutoAcceptFriendships tests
+	@Test(expected = NoUserLoggedInException.class)
+	public void cancelAutoAcceptRequiresLogin() throws NoUserLoggedInException {
+		sn.cancelAutoAcceptFriendships();
+	}
+
+	@Test
+	public void cancelAutoAcceptPreventsFutureAutoAcceptance() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		another = sn.join("Rafal");
+		sn.login(me);
+		sn.autoAcceptFriendships();
+		sn.login(her);
+		sn.sendFriendshipTo(me.getUserName());
+		assertTrue(me.hasFriend(her.getUserName()));
+		assertTrue(her.hasFriend(me.getUserName()));
+		sn.login(me);
+		sn.cancelAutoAcceptFriendships();
+		sn.login(another);
+		sn.sendFriendshipTo(me.getUserName());
+		sn.login(me);
+		assertTrue(me.getIncomingRequests().contains(another.getUserName()));
+		assertFalse(me.hasFriend(another.getUserName()));
+		assertFalse(another.hasFriend(me.getUserName()));
+	}
+
+	@Test
+	public void cancelAutoAcceptHasNoEffectIfAutoAcceptanceWasNeverSet() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.cancelAutoAcceptFriendships();
+		sn.login(her);
+		sn.sendFriendshipTo(me.getUserName());
+		sn.login(me);
+		assertTrue(me.getIncomingRequests().contains(her.getUserName()));
+		assertFalse(me.hasFriend(her.getUserName()));
+		assertFalse(her.hasFriend(me.getUserName()));
+	}
 	
 	// sendFriendshipCancellationTo tests
 	@Test

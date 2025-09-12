@@ -112,7 +112,8 @@ public class SocialNetwork implements ISocialNetwork {
 
 	
 	public void cancelAutoAcceptFriendships() throws NoUserLoggedInException {
-        ensureLoggedIn();
+		ensureLoggedIn();
+		current.cancelAutoAcceptFriendships();
     }
 
 	
