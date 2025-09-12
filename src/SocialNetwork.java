@@ -84,18 +84,11 @@ public class SocialNetwork implements ISocialNetwork {
 		accountForUserName.getIncomingRequests().remove(current.getUserName());
 		accountForUserName.getOutgoingRequests().remove(current.getUserName());
     }
-	
-	private java.util.Map<String, java.util.Set<String>> blocked = new java.util.HashMap<>();
 
 	public void unblock(String userName) throws NoUserLoggedInException {
 		ensureLoggedIn();
 		if (userName == null) return;
-
-		java.util.Set<String> set = blocked.get(current.getUserName());
-		if (set != null) {
-			set.remove(userName);
-		}
-
+		current.unblock(userName);
 	}
 	
 	public void sendFriendshipCancellationTo(String userName) throws NoUserLoggedInException {
@@ -141,43 +134,43 @@ public class SocialNetwork implements ISocialNetwork {
     }
 	
 	public Set<String> recommendFriends() throws NoUserLoggedInException {
-    ensureLoggedIn();
+		ensureLoggedIn();
 
-    String me = current.getUserName();
-    Set<String> myFriends = new HashSet<String>(current.getFriends());
-    java.util.Map<String, Integer> counts = new java.util.HashMap<String, Integer>();
+		String me = current.getUserName();
+		Set<String> myFriends = new HashSet<String>(current.getFriends());
+		java.util.Map<String, Integer> counts = new java.util.HashMap<String, Integer>();
 
-	myFriends.forEach(name -> {
-		Account friendAccount = findAccountForUserName(name);
-		if (friendAccount != null) {
-			friendAccount.getFriends().forEach(friendOfFriend -> {
-				if (friendOfFriend.equals(me)) return;
-				if (myFriends.contains(friendOfFriend)) return;
+		myFriends.forEach(name -> {
+			Account friendAccount = findAccountForUserName(name);
+			if (friendAccount != null) {
+				friendAccount.getFriends().forEach(friendOfFriend -> {
+					if (friendOfFriend.equals(me)) return;
+					if (myFriends.contains(friendOfFriend)) return;
 
-				// check blocking both directions
-				if (blocked.containsKey(me) && blocked.get(me).contains(friendOfFriend)) return;
-				if (blocked.containsKey(friendOfFriend) && blocked.get(friendOfFriend).contains(me)) return;
+					Account fofAccount = findAccountForUserName(friendOfFriend);
+					if (fofAccount == null) return;
+					// check blocking both directions
+					if (current.hasBlocked(friendOfFriend)) return;
+					if (fofAccount.hasBlocked(current.getUserName()))
+						return;
 
-				Account fofAccount = findAccountForUserName(friendOfFriend);
-				if (fofAccount == null) return;
+					if (counts.containsKey(friendOfFriend)) {
+						counts.put(friendOfFriend, counts.get(friendOfFriend) + 1);
+					} else {
+						counts.put(friendOfFriend, 1);
+					}
+				});
+			}
+		});
 
-				if (counts.containsKey(friendOfFriend)) {
-					counts.put(friendOfFriend, counts.get(friendOfFriend) + 1);
-				} else {
-					counts.put(friendOfFriend, 1);
-				}
-			});
+		Set<String> recommendations = new HashSet<String>();
+		for (String candidate : counts.keySet()) {
+			if (counts.get(candidate) >= 2) {
+				recommendations.add(candidate);
+			}
 		}
-	});
-
-    Set<String> recommendations = new HashSet<String>();
-    for (String candidate : counts.keySet()) {
-        if (counts.get(candidate) >= 2) {
-            recommendations.add(candidate);
-        }
-    }
-    return recommendations;
-}
+		return recommendations;
+	}
 
 
 	public void leave() throws NoUserLoggedInException {

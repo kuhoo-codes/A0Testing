@@ -67,6 +67,12 @@ public class Account  {
             blocked.add(userName);
     }
 
+    public void unblock(String userName) {
+        if (userName != null) {
+            blocked.remove(userName);
+        }
+    }
+
     // receive an acceptance from a member to whom a friend request has been sent and from whom no response has been received
     public void friendshipAccepted(Account toAccount) {
         if (toAccount.incomingRequests.contains(this.getUserName())) {
