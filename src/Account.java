@@ -18,7 +18,7 @@ public class Account  {
 
     private boolean autoAcceptFriendships = false;
 
-    private Set<String> blocked = new HashSet<>();
+    private Set<String> blocked = new HashSet<String>();
 
     public Account(String userName) {
         this.userName = userName;
@@ -60,6 +60,10 @@ public class Account  {
 
     public boolean hasBlocked(String userName) {
         return blocked.contains(userName);
+    }
+
+    public int getBlockedListSize() {
+        return blocked.size();
     }
 
     public void block(String userName) {

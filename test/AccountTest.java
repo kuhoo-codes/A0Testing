@@ -154,10 +154,46 @@ public class AccountTest {
 	}
 
     @Test
-	public void friendshipAcceptedWithoutRequestDoesNotEstablishFriendship() {
-		her.friendshipAccepted(me);
-		assertFalse(me.hasFriend(her.getUserName()));
-		assertFalse(her.hasFriend(me.getUserName()));;
-	}
+    public void friendshipAcceptedWithoutRequestDoesNotEstablishFriendship() {
+        her.friendshipAccepted(me);
+        assertFalse(me.hasFriend(her.getUserName()));
+        assertFalse(her.hasFriend(me.getUserName()));
+        ;
+    }
+    
+    @Test
+    public void blockAddsUserToBlockedList() {
+        me.block(her.getUserName());
+        assertTrue(me.hasBlocked(her.getUserName()));
+    }
+
+    @Test
+    public void unblockRemovesUserFromBlockedList() {
+        me.block(her.getUserName());
+        me.unblock(her.getUserName());
+        assertFalse(me.hasBlocked(her.getUserName()));
+    }
+
+    @Test
+    public void unblockOnUserNotBlockedHasNoEffect() {
+        int before = me.hasBlocked(her.getUserName()) ? 1 : 0;
+        me.unblock(her.getUserName());
+        int after = me.hasBlocked(her.getUserName()) ? 1 : 0;
+        assertEquals(before, after);
+    }
+
+    @Test
+    public void blockNullUserHasNoEffect() {
+        int beforeSize = 0; 
+        me.block(null);
+        assertEquals(beforeSize, me.getBlockedListSize());
+    }
+
+    @Test
+    public void unblockNullUserHasNoEffect() {
+        me.block(her.getUserName());
+        me.unblock(null); 
+        assertTrue(me.hasBlocked(her.getUserName()));
+    }
 
 }

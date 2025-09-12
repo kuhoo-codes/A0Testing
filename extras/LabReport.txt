@@ -9,15 +9,15 @@ Andrew ID: snyang, kuhoos
  - Firstly re-wrote most of the code and then mapped out all the edge cases for tests for the old and new functions.
  - Wrote the tests first using the discussion on edge cases and then wrote the main production code.
  - Performed a lot of debugging to resolve all the issues and completed integration of Production code and Test code.
- - Roughly 3 tests per very new functionality added
+ - Roughly 2-3 tests per every new functionality added so roughly 40 test cases.
  
 2. What worked well? 
  - TDD made us think of edge cases before even jumping to the code bit. This was helpful in identifying where the function might have failed otherwise.
  - Writing tests first made it easier to see what the function should actually do before we wrote any code.
  - For example, when we worked on recommendFriends, we initially wrote a test that said “only return people with at least two mutual friends.” 
  - That test failing reminded me not to include users with just one mutual connection or the ones blocked even if they come up in the list.
+ - Having tests already there gave me confidence — every time I changed the code, I could run them and know right away if I broke something.
 
-Having tests already there gave me confidence — every time I changed the code, I could run them and know right away if I broke something.
 3. What didn't work well? 
  - The most difficult part was refactoring the code to make the old as well as new test cases to pass. It took a bit of back and forth to finalise it.
  - Another main one was writing the block/unblock feature.
