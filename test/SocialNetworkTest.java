@@ -490,4 +490,166 @@ public class SocialNetworkTest {
         sn.leave();
         assertFalse(her.getOutgoingRequests().contains(me.getUserName()));
     }
+	// --- Task 7: recommendFriends tests ---
+
+	@Test(expected = NoUserLoggedInException.class)
+	public void recommendFriendsRequiresLogin() throws NoUserLoggedInException {
+		// not logged in
+		sn.recommendFriends();
+	}
+
+	@Test
+	public void recommendFriendsReturnsOnlyUsersWithAtLeastTwoMutuals() throws NoUserLoggedInException {
+		// Hakan is me, Cecile and Rafal are my friends.
+		// Kuhoo is friend with both Cecile and Hakan => should be recommended.
+		// Shannon is friend with only Cecile => should NOT be recommended.
+		Account me = sn.join("Hakan");
+		Account cecile = sn.join("Cecile");
+		Account rafal = sn.join("Rafal");
+		Account kuhoo = sn.join("Kuhoo");
+		Account shannon = sn.join("Shannon");
+
+		sn.login(me);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(me.getUserName());
+
+		sn.login(me);
+		sn.sendFriendshipTo(rafal.getUserName());
+		sn.login(rafal);
+		sn.acceptFriendshipFrom(me.getUserName());
+
+		sn.login(kuhoo);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(kuhoo.getUserName());
+
+		sn.login(kuhoo);
+		sn.sendFriendshipTo(rafal.getUserName());
+		sn.login(rafal);
+		sn.acceptFriendshipFrom(kuhoo.getUserName());
+
+		sn.login(shannon);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(shannon.getUserName());
+
+		sn.login(me);
+		Set<String> recs = sn.recommendFriends();
+
+		assertTrue(recs.contains(kuhoo.getUserName()));     
+		assertFalse(recs.contains(shannon.getUserName()));    
+		assertFalse(recs.contains(cecile.getUserName()));   
+		assertFalse(recs.contains(rafal.getUserName()));    
+		//assertFalse(recs.contains(me.getUserName()));    
+	}
+//Kuhoo [To do]
+	@Test
+	public void recommendFriendsExcludesBlockedUsersInEitherDirection() throws NoUserLoggedInException {
+		Account me = sn.join("Hakan");
+		Account cecile = sn.join("Cecile");
+		Account rafal = sn.join("Rafal");
+		Account kuhoo = sn.join("Kuhoo"); //  two mutuals
+
+		// A <-> B and A <-> C
+		sn.login(me);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(me.getUserName());
+
+		sn.login(me);
+		sn.sendFriendshipTo(rafal.getUserName());
+		sn.login(rafal);
+		sn.acceptFriendshipFrom(me.getUserName());
+
+		// D <-> B and D <-> C (two mutuals with A)
+		sn.login(kuhoo);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(kuhoo.getUserName());
+
+		sn.login(kuhoo);
+		sn.sendFriendshipTo(rafal.getUserName());
+		sn.login(rafal);
+		sn.acceptFriendshipFrom(kuhoo.getUserName());
+
+		// Hakan blocks Kuhoo 
+		sn.login(me);
+		sn.block(kuhoo.getUserName());
+		Set<String> recs1 = sn.recommendFriends();
+		assertFalse(recs1.contains(kuhoo.getUserName()));
+
+		// Kuhoo blocks Hakan -> 
+		sn.unblock(kuhoo.getUserName());
+		sn.login(kuhoo);
+		sn.block(me.getUserName());
+
+		sn.login(me);
+		Set<String> recs2 = sn.recommendFriends();
+		assertFalse(recs2.contains(kuhoo.getUserName()));
+	}
+
+	@Test
+	public void recommendFriendsIsEmptyWhenNoCandidateHasTwoMutuals() throws NoUserLoggedInException {
+		Account me = sn.join("Hakan");
+		Account cecile = sn.join("Cecile");
+		Account shannon = sn.join("Shannon"); // only one mutual
+
+		sn.login(me);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(me.getUserName());
+
+		sn.login(shannon);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(shannon.getUserName());
+
+
+		sn.login(me);
+		Set<String> recs = sn.recommendFriends();
+		assertTrue(recs.isEmpty());
+	}
+
+	@Test
+	public void recommendFriendsDoesNotIncludeExistingFriendsEvenWithTwoMutuals() throws NoUserLoggedInException {
+		Account me = sn.join("A");
+		Account cecile = sn.join("B");
+		Account rafal = sn.join("C");
+		Account kuhoo = sn.join("D"); // will be existing friend and also have mutuals
+
+		// A <-> B, A <-> C
+		sn.login(me);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(me.getUserName());
+
+		sn.login(me);
+		sn.sendFriendshipTo(rafal.getUserName());
+		sn.login(rafal);
+		sn.acceptFriendshipFrom(me.getUserName());
+
+		// Make D friend with B and C
+		sn.login(kuhoo);
+		sn.sendFriendshipTo(cecile.getUserName());
+		sn.login(cecile);
+		sn.acceptFriendshipFrom(kuhoo.getUserName());
+
+		sn.login(kuhoo);
+		sn.sendFriendshipTo(rafal.getUserName());
+		sn.login(rafal);
+		sn.acceptFriendshipFrom(kuhoo.getUserName());
+
+		// Also A <-> D (so D is an existing friend and must be excluded)
+		sn.login(me);
+		sn.sendFriendshipTo(kuhoo.getUserName());
+		sn.login(kuhoo);
+		sn.acceptFriendshipFrom(me.getUserName());
+
+		sn.login(me);
+		Set<String> recs = sn.recommendFriends();
+		assertFalse(recs.contains(kuhoo.getUserName())); // exclude existing friend
+	}
+				
+
 }
