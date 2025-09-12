@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class SocialNetworkTest {
 	SocialNetwork sn;
-	Account me, her, another;
+	Account me, her, another, current;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -59,7 +59,7 @@ public class SocialNetworkTest {
 	
 	@Test 
 	public void sizeOfSNMatchesNoOfMultiplePeopleJoining() 
-			throws NoUserLoggedInException { 
+			throws NoUserLoggedInException {
 		Set<Account> users = new HashSet<Account>();
 		users.add(sn.join("Hakan"));
 		users.add(sn.join("Cecile"));
@@ -68,6 +68,36 @@ public class SocialNetworkTest {
 		assertEquals(users.size(), members.size());
 		assertTrue(members.contains("Hakan"));
 		assertTrue(members.contains("Cecile"));
+	}
+	
+	@Test
+	public void loginReturnsCorrectUserName() {
+		me = sn.join("Hakan");
+		current = sn.login(me);
+		assertEquals(me.getUserName(), current.getUserName());
+	}
+
+	@Test
+	public void loginWithNullReturnsNullAccount() {
+		current = sn.login(null);
+		assertNull(current);
+	}
+
+	@Test
+	public void loginWithNonExistentAccountReturnsNullAccount() {
+		Account nullAccount = new Account("NullAccount");
+		current = sn.login(nullAccount);
+		assertNull(current);
+	}
+
+	@Test
+	public void canSwitchAccountsWithoutLogout() {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		current = sn.login(me);
+		assertEquals(me.getUserName(), current.getUserName());
+		current = sn.login(her);                
+		assertEquals(her.getUserName(), current.getUserName());
 	}
 	
 	@Test 
