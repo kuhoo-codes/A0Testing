@@ -382,12 +382,63 @@ public class SocialNetworkTest {
 	public void cancelFriendshipWhenNotFriendsHasNoEffect() 
 			throws NoUserLoggedInException {
 		me = sn.join("Hakan");
-        her = sn.join("Cecile");
-        sn.login(me);
-        sn.sendFriendshipCancellationTo(her.getUserName());
-        assertFalse(me.hasFriend(her.getUserName()));
-        assertFalse(her.hasFriend(me.getUserName()));
-    }
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.sendFriendshipCancellationTo(her.getUserName());
+		assertFalse(me.hasFriend(her.getUserName()));
+		assertFalse(her.hasFriend(me.getUserName()));
+	}
+	
+	// block tests
+	@Test
+	public void blockPreventsBlockedFromListing() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.block(her.getUserName());
+		sn.login(her);
+		Set<String> members = sn.listMembers();
+		assertFalse(members.contains(me.getUserName()));
+	}
+
+	@Test
+	public void blockPreventsBlockedFromSendingFriendRequest() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.block(her.getUserName());
+		sn.login(her);
+		sn.sendFriendshipTo(me.getUserName());
+		assertFalse(me.getIncomingRequests().contains(her.getUserName()));
+	}
+	
+	@Test
+	public void blockTerminatesExistingFriendshipsBetweenTwoMembers() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.sendFriendshipTo(her.getUserName());
+		sn.login(her);
+		sn.acceptFriendshipFrom(me.getUserName());
+		sn.login(me);
+		sn.block(her.getUserName());
+		assertFalse(me.hasFriend(her.getUserName()));
+		assertFalse(her.hasFriend(me.getUserName()));
+	}
+
+	@Test
+	public void blockTerminatesExistingPendingFriendshipRequestsBetweenTwoMembers() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.sendFriendshipTo(her.getUserName());
+		sn.login(her);
+		sn.sendFriendshipTo(me.getUserName());
+		sn.login(me);
+		sn.block(her.getUserName());
+		assertFalse(me.getIncomingRequests().contains(her.getUserName()));
+		assertFalse(her.getIncomingRequests().contains(me.getUserName()));
+	}
 	
 	// leave tests
 	@Test

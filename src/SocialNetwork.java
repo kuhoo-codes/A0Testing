@@ -28,7 +28,6 @@ public class SocialNetwork implements ISocialNetwork {
         return current;
     }
 
-	// find a member by user name 
 	private Account findAccountForUserName(String userName) {
 		// find account with user name userName
 		// not accessible to outside because that would give a user full access to another member's account
@@ -43,20 +42,25 @@ public class SocialNetwork implements ISocialNetwork {
 		ensureLoggedIn();
 		Set<String> members = new HashSet<String>();
 		for (Account each : accounts) {
-			members.add(each.getUserName());
+			if (!each.hasBlocked(current.getUserName())) {  // key line
+				members.add(each.getUserName());
+			}
 		}
 		return members;
 	}
 	
 	public boolean hasMember(String userName) throws NoUserLoggedInException {
 		ensureLoggedIn();
-        return findAccountForUserName(userName) != null;
+        Account accountForUserName = findAccountForUserName(userName);
+		if (accountForUserName == null) return false;
+		if (accountForUserName.hasBlocked(current.getUserName())) return false;
+		return true;
     }
 	
 	public void sendFriendshipTo(String userName) throws NoUserLoggedInException {
 		ensureLoggedIn();
 		Account accountForUserName = findAccountForUserName(userName);
-		if (accountForUserName != null) {
+		if (accountForUserName != null && !accountForUserName.hasBlocked(current.getUserName())) {
 			accountForUserName.requestFriendship(current);
 		}
 	}
@@ -66,7 +70,19 @@ public class SocialNetwork implements ISocialNetwork {
     }
 
 	public void block(String userName) throws NoUserLoggedInException {
-        ensureLoggedIn();
+		ensureLoggedIn();
+		Account accountForUserName = findAccountForUserName(userName);
+		if (accountForUserName == null) return;
+		current.block(userName);
+
+		if (current.hasFriend(userName)) {
+			accountForUserName.cancelFriendship(current);
+		}
+
+		current.getIncomingRequests().remove(userName);
+		current.getOutgoingRequests().remove(userName);
+		accountForUserName.getIncomingRequests().remove(current.getUserName());
+		accountForUserName.getOutgoingRequests().remove(current.getUserName());
     }
 	
 	public void unblock(String userName) throws NoUserLoggedInException {
@@ -109,13 +125,11 @@ public class SocialNetwork implements ISocialNetwork {
 		ensureLoggedIn();
 		current.autoAcceptFriendships();
 	};
-
 	
 	public void cancelAutoAcceptFriendships() throws NoUserLoggedInException {
 		ensureLoggedIn();
 		current.cancelAutoAcceptFriendships();
     }
-
 	
 	public Set<String> recommendFriends() throws NoUserLoggedInException {
         ensureLoggedIn();

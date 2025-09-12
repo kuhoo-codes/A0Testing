@@ -18,6 +18,8 @@ public class Account  {
 
     private boolean autoAcceptFriendships = false;
 
+    private Set<String> blocked = new HashSet<>();
+
     public Account(String userName) {
         this.userName = userName;
     }
@@ -56,28 +58,14 @@ public class Account  {
         return friends.contains(userName);
     }
 
-    // receive an acceptance from a member to whom a friend request has been sent and from whom no response has been received
-    // public void friendshipAccepted(Account toAccount) {
-        
-    //     // if (!toAccount.incomingRequests.contains(this.getUserName())) {
-    //     //     return; // no pending request from toAccount
-    //     // }
-    //     // make them friends
-    //     friends.add(toAccount.getUserName());
-    //     toAccount.friends.add(this.getUserName());
-    //     toAccount.incomingRequests.remove(this.getUserName());
-    //     outgoingRequests.remove(toAccount.getUserName());
-    // }
+    public boolean hasBlocked(String userName) {
+        return blocked.contains(userName);
+    }
 
-    // receive an acceptance from a member to whom a friend request has been sent and from whom no response has been received
-	// public void friendshipAccepted(Account toAccount) {
-	// 	if (toAccount.getIncomingRequests().contains(this.getUserName())) {
-	// 		friends.add(toAccount.getUserName());
-	// 		toAccount.friends.add(this.getUserName());
-	// 		toAccount.incomingRequests.remove(this.getUserName());
-	// 		outgoingRequests.remove(toAccount.getUserName());
-	// 	}
-	// }
+    public void block(String userName) {
+        if (userName != null)
+            blocked.add(userName);
+    }
 
     // receive an acceptance from a member to whom a friend request has been sent and from whom no response has been received
     public void friendshipAccepted(Account toAccount) {
