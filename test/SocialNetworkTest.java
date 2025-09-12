@@ -459,6 +459,32 @@ public class SocialNetworkTest {
 		assertFalse(her.getIncomingRequests().contains(me.getUserName()));
 	}
 
+	//unlock tests
+
+	@Test
+	public void unblockAllowsToBeVisibleOnListing() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.block(her.getUserName());
+		sn.unblock(her.getUserName());
+
+		sn.login(her);
+		Set<String> members = sn.listMembers();
+		assertTrue(members.contains(me.getUserName()));
+	}
+	
+	@Test
+	public void unblockAllowsPreviouslyBlockedFromSeeingMembership() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.block(her.getUserName());
+		sn.unblock(her.getUserName());
+		sn.login(her);
+		assertTrue(sn.hasMember(me.getUserName()));
+	}
+
 	@Test
 	public void unblockingANullAccountHasNoEffect() throws NoUserLoggedInException {
 		me = sn.join("Hakan");
@@ -593,7 +619,6 @@ public class SocialNetworkTest {
 		assertFalse(recs.contains(rafal.getUserName()));    
 		//assertFalse(recs.contains(me.getUserName()));    
 	}
-//Kuhoo [To do]
 	@Test
 	public void recommendFriendsExcludesBlockedUsersInEitherDirection() throws NoUserLoggedInException {
 		Account me = sn.join("Hakan");
