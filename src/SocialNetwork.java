@@ -148,7 +148,6 @@ public class SocialNetwork implements ISocialNetwork {
 					if (myFriends.contains(friendOfFriend)) return;
 
 					Account fofAccount = findAccountForUserName(friendOfFriend);
-					if (fofAccount == null) return;
 					// check blocking both directions
 					if (current.hasBlocked(friendOfFriend)) return;
 					if (fofAccount.hasBlocked(current.getUserName()))
@@ -186,9 +185,7 @@ public class SocialNetwork implements ISocialNetwork {
 		//retract all outgoing friend requests
 		for (String requestee : new HashSet<String>(current.getOutgoingRequests())) {
 			Account acc = findAccountForUserName(requestee);
-			if (acc != null) {
-				acc.getIncomingRequests().remove(current.getUserName());
-			}
+			acc.getIncomingRequests().remove(current.getUserName());
 			current.getOutgoingRequests().remove(requestee);
 		}
 		accounts.remove(current);

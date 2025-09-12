@@ -15,8 +15,8 @@ Andrew ID: snyang, kuhoos
  - TDD made us think of edge cases before even jumping to the code bit. This was helpful in identifying where the function might have failed otherwise.
  - Writing tests first made it easier to see what the function should actually do before we wrote any code.
  - For example, when we worked on recommendFriends, we initially wrote a test that said “only return people with at least two mutual friends.” 
- - That test failing reminded me not to include users with just one mutual connection or the ones blocked even if they come up in the list.
- - Having tests already there gave me confidence — every time I changed the code, I could run them and know right away if I broke something.
+ - That test failing reminded us not to include users with just one mutual connection or the ones blocked even if they come up in the list.
+ - Having tests already there gave us confidence — every time I changed the code, I could run them and know right away if I broke something.
 
 3. What didn't work well? 
  - The most difficult part was refactoring the code to make the old as well as new test cases to pass. It took a bit of back and forth to finalise it.

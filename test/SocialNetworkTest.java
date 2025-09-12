@@ -400,6 +400,25 @@ public class SocialNetworkTest {
 		Set<String> members = sn.listMembers();
 		assertFalse(members.contains(me.getUserName()));
 	}
+	
+	@Test
+	public void blockPreventsBlockedFromSeeingMembership() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		her = sn.join("Cecile");
+		sn.login(me);
+		sn.block(her.getUserName());
+		sn.login(her);
+		assertFalse(sn.hasMember(me.getUserName()));
+	}
+
+	@Test
+	public void blockingNonExistantUserDoesNotResultInAnyBlock() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		String herName= "Cecile";
+		sn.login(me);
+		sn.block(herName);	
+		assertFalse(me.hasBlocked(herName));
+	}
 
 	@Test
 	public void blockPreventsBlockedFromSendingFriendRequest() throws NoUserLoggedInException {
@@ -438,6 +457,15 @@ public class SocialNetworkTest {
 		sn.block(her.getUserName());
 		assertFalse(me.getIncomingRequests().contains(her.getUserName()));
 		assertFalse(her.getIncomingRequests().contains(me.getUserName()));
+	}
+
+	@Test
+	public void unblockingANullAccountHasNoEffect() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+		sn.login(me);
+		int blockedSize = me.getBlockedListSize();
+		sn.unblock(null);
+		assertEquals(blockedSize, me.getBlockedListSize());
 	}
 	
 	// leave tests
@@ -490,7 +518,29 @@ public class SocialNetworkTest {
         sn.leave();
         assertFalse(her.getOutgoingRequests().contains(me.getUserName()));
     }
-	// --- Task 7: recommendFriends tests ---
+
+		@Test
+	public void leavingClearsMyIncomingRequests() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+        her = sn.join("Cecile");
+        sn.login(her);
+        sn.sendFriendshipTo(me.getUserName());
+        assertTrue(me.getIncomingRequests().contains(her.getUserName()));
+        sn.login(me);
+        sn.leave();
+        assertFalse(me.getIncomingRequests().contains(her.getUserName()));
+	}
+	
+	@Test
+	public void leavingClearsMyOutgoingRequests() throws NoUserLoggedInException {
+		me = sn.join("Hakan");
+        her = sn.join("Cecile");
+        sn.login(me);
+        sn.sendFriendshipTo(her.getUserName());
+        assertTrue(me.getOutgoingRequests().contains(her.getUserName()));
+        sn.leave();
+        assertFalse(me.getOutgoingRequests().contains(her.getUserName()));
+    }
 
 	@Test(expected = NoUserLoggedInException.class)
 	public void recommendFriendsRequiresLogin() throws NoUserLoggedInException {
